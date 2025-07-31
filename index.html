@@ -18,6 +18,17 @@
       padding: 10px;
       text-align: center;
     }
+    #location-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      padding: 10px;
+      background-color: white;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
     @media (max-width: 768px) {
       h3 {
         font-size: 1.2em;
@@ -25,11 +36,16 @@
       #map {
         height: 50vh; /* Adjust height for smaller screens */
       }
+      #location-button {
+        padding: 5px;
+        font-size: 0.8em;
+      }
     }
   </style>
 </head>
 <body>
   <h3>Pneumatic 2-1/2 in. 15° Siding Coil Nailer - Store Locations</h3>
+  <button id="location-button">Center on Current Location</button>
   <div id="map"></div>
 
   <script>
@@ -106,7 +122,7 @@
         { position: { lat: 39.8967, lng: -75.3267 }, title: "Store #4142", info: "Store #4142<br>300 Macdade Blvd, Folsom PA<br>Price: $59.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 9 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "300 Macdade Blvd, Folsom PA" },
         { position: { lat: 39.9667, lng: -75.3167 }, title: "Store #4181", info: "Store #4181<br>700 Reed Road, Broomall PA<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 9 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "700 Reed Road, Broomall PA" },
         { position: { lat: 39.9067, lng: -75.0567 }, title: "Store #974", info: "Store #974<br>320 Bridgeton Pike, Mantua NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 10 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "320 Bridgeton Pike, Mantua NJ" },
-        { position: { lat: 39.8467, lng: -74.9667 }, title: "Store #914", info: "Store #914<br>1200 Nixon Dr, Mount Laurel NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 12 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "1200 Nixon Dr, Mount Laurel NJ" },
+        { position: { lat: 39.8467, lng: -74.9664 }, title: "Store #914", info: "Store #914<br>1200 Nixon Dr, Mount Laurel NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 12 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "1200 Nixon Dr, Mount Laurel NJ" },
         { position: { lat: 40.0667, lng: -75.1167 }, title: "Store #6866", info: "Store #6866<br>11725 Bustleton Ave, Philadelphia PA<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 15 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "11725 Bustleton Ave, Philadelphia PA" },
         { position: { lat: 39.8267, lng: -74.9967 }, title: "Store #940", info: "Store #940<br>116 Walker Ave, West Berlin NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 16 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "116 Walker Ave, West Berlin NJ" },
         { position: { lat: 39.8167, lng: -75.4667 }, title: "Store #1602", info: "Store #1602<br>601 Naamans Rd, Claymont DE<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 17 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "601 Naamans Rd, Claymont DE" },
@@ -142,13 +158,11 @@
           content: store.info
         });
 
-        // Open navigation URL on marker click
         marker.addListener("click", () => {
-          const encodedAddress = encodeURIComponent(store.address.replace(/ /g, '+'));
+          const encodedAddress = encodeURIComponent(store.address);
           window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, '_blank');
         });
 
-        // Open info window on marker click (optional, can be removed if navigation is primary)
         marker.addListener("click", () => {
           infoWindow.open(map, marker);
         });
