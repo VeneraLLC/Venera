@@ -56,6 +56,44 @@
         gestureHandling: 'greedy' // Enables touch gestures like pinch-to-zoom
       });
 
+      let currentLocationMarker = null;
+
+      // Function to center on current location
+      function centerOnCurrentLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              map.panTo(userLocation);
+              map.setZoom(10); // Adjust zoom level for better view
+
+              // Add or update current location marker
+              if (currentLocationMarker) {
+                currentLocationMarker.setPosition(userLocation);
+              } else {
+                currentLocationMarker = new google.maps.Marker({
+                  position: userLocation,
+                  map: map,
+                  icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // Placeholder, replace with swastika if provided
+                  title: "You Are Here"
+                });
+              }
+            },
+            () => {
+              alert("Geolocation permission denied or unavailable. Please enable location services.");
+            }
+          );
+        } else {
+          alert("Geolocation is not supported by this browser.");
+        }
+      }
+
+      // Add event listener to the button
+      document.getElementById("location-button").addEventListener("click", centerOnCurrentLocation);
+
       const stores = [
         { position: { lat: 37.5985, lng: -77.5166 }, title: "Store #4632", info: "Store #4632<br>6501 W Broad St, Richmond VA<br>Price: $429.00<br>Stock: 4<br>Location: Aisle 14 - Bay 13<br>Distance: 5 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", address: "6501 W Broad St, Richmond VA" },
         { position: { lat: 37.7089, lng: -77.4594 }, title: "Store #4653", info: "Store #4653<br>10233 Lakeridge Parkway, Ashland VA<br>Price: $429.00<br>Stock: 2<br>Location: Aisle 15 - Bay 6<br>Distance: 8 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", address: "10233 Lakeridge Parkway, Ashland VA" },
@@ -122,7 +160,7 @@
         { position: { lat: 39.8967, lng: -75.3267 }, title: "Store #4142", info: "Store #4142<br>300 Macdade Blvd, Folsom PA<br>Price: $59.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 9 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "300 Macdade Blvd, Folsom PA" },
         { position: { lat: 39.9667, lng: -75.3167 }, title: "Store #4181", info: "Store #4181<br>700 Reed Road, Broomall PA<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 9 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "700 Reed Road, Broomall PA" },
         { position: { lat: 39.9067, lng: -75.0567 }, title: "Store #974", info: "Store #974<br>320 Bridgeton Pike, Mantua NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 10 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "320 Bridgeton Pike, Mantua NJ" },
-        { position: { lat: 39.8467, lng: -74.9664 }, title: "Store #914", info: "Store #914<br>1200 Nixon Dr, Mount Laurel NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 12 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "1200 Nixon Dr, Mount Laurel NJ" },
+        { position: { lat: 39.8467, lng: -74.9667 }, title: "Store #914", info: "Store #914<br>1200 Nixon Dr, Mount Laurel NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 12 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "1200 Nixon Dr, Mount Laurel NJ" },
         { position: { lat: 40.0667, lng: -75.1167 }, title: "Store #6866", info: "Store #6866<br>11725 Bustleton Ave, Philadelphia PA<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 15 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "11725 Bustleton Ave, Philadelphia PA" },
         { position: { lat: 39.8267, lng: -74.9967 }, title: "Store #940", info: "Store #940<br>116 Walker Ave, West Berlin NJ<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 16 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "116 Walker Ave, West Berlin NJ" },
         { position: { lat: 39.8167, lng: -75.4667 }, title: "Store #1602", info: "Store #1602<br>601 Naamans Rd, Claymont DE<br>Price: $69.00 (Restock)<br>Stock: 0<br>Location: N/A<br>Distance: 17 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", address: "601 Naamans Rd, Claymont DE" },
@@ -168,6 +206,44 @@
         });
       });
     }
+
+    // Ensure the button works
+    document.addEventListener("DOMContentLoaded", () => {
+      const locationButton = document.getElementById("location-button");
+      if (locationButton) {
+        locationButton.addEventListener("click", () => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const userLocation = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+                map.panTo(userLocation);
+                map.setZoom(10); // Adjust zoom for better view of current location
+
+                // Add or update current location marker
+                if (window.currentLocationMarker) {
+                  window.currentLocationMarker.setPosition(userLocation);
+                } else {
+                  window.currentLocationMarker = new google.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // Placeholder, replace with swastika if provided
+                    title: "You Are Here"
+                  });
+                }
+              },
+              (error) => {
+                alert("Error getting location: " + error.message + ". Please enable location services.");
+              }
+            );
+          } else {
+            alert("Geolocation is not supported by this browser.");
+          }
+        });
+      }
+    });
   </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGkKq-mR_Yb1xYsGDNJqJQaxQekWzWyOQ&callback=initMap"></script>
 </body>
