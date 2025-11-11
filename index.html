@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultra Pure White Semi-Gloss Enamel Exterior Paint & Primer - Store Locations</title>
+  <title>Ultra Pure White Semi-Gloss Paint – 50 Stores</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <style>
-    body{margin:0;padding:0;font-size:16px;font-family:Arial,sans-serif}
+    body{margin:0;padding:0;font-family:Arial,sans-serif}
     #map{width:100%;height:100vh}
     h3{font-size:1.5em;padding:10px;text-align:center;margin:0;background:#1a73e8;color:white}
     #location-button{
@@ -23,14 +23,13 @@
     a:hover{text-decoration:underline}
     @media(max-width:768px){
       h3{font-size:1.2em}
-      #map{height:100vh}
       #location-button{top:55px;padding:8px;font-size:0.9em}
       #info-panel{top:100px;width:90%;left:5%;max-height:180px;font-size:0.85em}
     }
   </style>
 </head>
 <body>
-  <h3>Ultra Pure White Semi-Gloss Paint – 50 Stores (In-Stock: Green, Restock: Blue)</h3>
+  <h3>Ultra Pure White Semi-Gloss Paint – 50 Stores (Green: In Stock, Blue: Restock)</h3>
   <button id="location-button">Center on Current Location</button>
   <div id="info-panel"></div>
   <div id="map"></div>
@@ -47,6 +46,7 @@
         streetViewControl: false
       });
 
+      // One-time location centering
       document.getElementById("location-button").addEventListener("click", () => {
         if (!navigator.geolocation) {
           alert("Geolocation not supported.");
@@ -72,14 +72,19 @@
         );
       });
 
+      // Mobile: geo: URI | Desktop: Google Maps
       function openDirections(address) {
         const cleanAddr = address.replace(/<[^>]*>/g, '').trim();
         const enc = encodeURIComponent(cleanAddr);
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const url = isMobile 
-          ? `geo:0,0?q=${enc}` 
-          : `https://www.google.com/maps/dir/?api=1&destination=${enc}`;
-        window.open(url, '_blank');
+
+        if (isMobile) {
+          // Force native GPS app
+          window.location.href = `geo:0,0?q=${enc}`;
+        } else {
+          // Desktop: Google Maps Directions
+          window.open(`https://www.google.com/maps/dir/?api=1&destination=${enc}`, '_blank');
+        }
       }
 
       const stores = [
@@ -141,7 +146,7 @@
           ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png" 
           : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
 
-        const infoHTML = `${s.title}<br>${s.addr}<br>Price: ${s.price}<br>Stock: ${s.stock} <a href="#" onclick="openDirections('${s.addr}');return false;">Get Directions</a><br>Location: ${s.loc}<br>Distance: ${s.dist} miles`;
+        const infoHTML = `<strong>${s.title}</strong><br>${s.addr}<br>Price: ${s.price}<br>Stock: ${s.stock} <a href="#" onclick="openDirections('${s.addr}');return false;">Get Directions</a><br>Location: ${s.loc}<br>Distance: ${s.dist} miles`;
 
         const marker = new google.maps.Marker({
           position: { lat: s.lat, lng: s.lng },
