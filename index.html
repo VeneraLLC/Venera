@@ -21,10 +21,21 @@
     #info-panel.show{display:block}
     a{color:#1a73e8;text-decoration:none;font-weight:bold}
     a:hover{text-decoration:underline}
+    #allow-banner{
+      position:fixed;bottom:0;left:0;right:0;
+      background:#fffde7;padding:12px 16px;
+      border-top:2px solid #ffc107;text-align:center;
+      font-size:0.95em;z-index:2000;display:none;
+      box-shadow:0 -2px 8px rgba(0,0,0,.1)
+    }
+    #allow-banner.show{display:block}
+    #allow-btn{background:#1a73e8;color:#fff;padding:6px 14px;
+      border:none;border-radius:4px;cursor:pointer;margin-left:8px}
     @media(max-width:768px){
       h3{font-size:1.2em}
       #location-button{top:55px;padding:8px;font-size:0.9em}
       #info-panel{top:100px;width:90%;left:5%;max-height:180px;font-size:0.85em}
+      #allow-banner{font-size:0.9em;padding:10px}
     }
   </style>
 </head>
@@ -32,61 +43,74 @@
   <h3>Ultra Pure White Semi-Gloss Paint – 50 Stores (Green: In Stock, Blue: Restock)</h3>
   <button id="location-button">Center on Current Location</button>
   <div id="info-panel"></div>
+  <div id="allow-banner">
+    <span>This site wants to open directions in your maps app.</span>
+    <button id="allow-btn">Allow</button>
+  </div>
   <div id="map"></div>
 
   <script>
-    let map, userMarker;
+    let map, userMarker, directionsAllowed = false;
 
+    // ---------- POP-UP BLOCKER HANDLER ----------
+    const banner = document.getElementById('allow-banner');
+    const allowBtn = document.getElementById('allow-btn');
+
+    function requestDirectionsPermission(address) {
+      if (directionsAllowed) {
+        launchDirections(address);
+        return;
+      }
+      // Show banner the first time
+      banner.classList.add('show');
+      allowBtn.onclick = () => {
+        directionsAllowed = true;
+        banner.classList.remove('show');
+        launchDirections(address);
+      };
+    }
+
+    function launchDirections(address) {
+      const clean = address.replace(/&/g, '%26').trim();
+      const enc = encodeURIComponent(clean);
+      const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (mobile) {
+        window.location.href = `geo:0,0?q=${enc}`;
+      } else {
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${enc}`, '_blank');
+      }
+    }
+
+    // ---------- MAP INITIALISATION ----------
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
         center: { lat: 37.5407, lng: -77.4360 },
-        gestureHandling: 'greedy',
+        gestureNeeded: 'greedy',
         mapTypeControl: false,
         streetViewControl: false
       });
 
       // One-time location centering
       document.getElementById("location-button").addEventListener("click", () => {
-        if (!navigator.geolocation) {
-          alert("Geolocation not supported.");
-          return;
-        }
+        if (!navigator.geolocation) { alert("Geolocation not supported."); return; }
         navigator.geolocation.getCurrentPosition(
           pos => {
             const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            map.panTo(loc);
-            map.setZoom(12);
+            map.panTo(loc); map.setZoom(12);
             if (userMarker) userMarker.setPosition(loc);
-            else {
-              userMarker = new google.maps.Marker({
-                position: loc,
-                map: map,
-                icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                title: "You Are Here"
-              });
-            }
+            else userMarker = new google.maps.Marker({
+              position: loc, map: map,
+              icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+              title: "You Are Here"
+            });
           },
           err => alert("Location error: " + err.message),
           { enableHighAccuracy: true, timeout: 8000 }
         );
       });
 
-      // Mobile: geo: URI | Desktop: Google Maps
-      function openDirections(address) {
-        const cleanAddr = address.replace(/<[^>]*>/g, '').trim();
-        const enc = encodeURIComponent(cleanAddr);
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-        if (isMobile) {
-          // Force native GPS app
-          window.location.href = `geo:0,0?q=${enc}`;
-        } else {
-          // Desktop: Google Maps Directions
-          window.open(`https://www.google.com/maps/dir/?api=1&destination=${enc}`, '_blank');
-        }
-      }
-
+      // ---------- STORE DATA ----------
       const stores = [
         {addr:"7251 Bell Creek Rd, Mechanicsville VA",title:"Store #4624",price:"$27.00 (Restock)",stock:0,loc:"N/A",dist:4,lat:37.6078,lng:-77.3747},
         {addr:"6501 W Broad St, Richmond VA",title:"Store #4632",price:"$144.00",stock:1,loc:"Aisle 6 - Bay 12",dist:5,lat:37.5985,lng:-77.5166},
@@ -146,7 +170,8 @@
           ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png" 
           : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
 
-        const infoHTML = `<strong>${s.title}</strong><br>${s.addr}<br>Price: ${s.price}<br>Stock: ${s.stock} <a href="#" onclick="openDirections('${s.addr}');return false;">Get Directions</a><br>Location: ${s.loc}<br>Distance: ${s.dist} miles`;
+        const safe = s.addr.replace(/'/g, "\\'");
+        const html = `<strong>${s.title}</strong><br>${s.addr}<br>Price: ${s.price}<br>Stock: ${s.stock} <a href="#" onclick="requestDirectionsPermission('${safe}'); return false;">Get Directions</a><br>Location: ${s.loc}<br>Distance: ${s.dist} miles`;
 
         const marker = new google.maps.Marker({
           position: { lat: s.lat, lng: s.lng },
@@ -155,18 +180,16 @@
           icon: icon
         });
 
-        const infowindow = new google.maps.InfoWindow({ content: infoHTML, maxWidth: 260 });
+        const iw = new google.maps.InfoWindow({ content: html, maxWidth: 260 });
 
         marker.addListener("click", () => {
-          infowindow.open(map, marker);
-          document.getElementById("info-panel").innerHTML = infoHTML;
+          iw.open(map, marker);
+          document.getElementById("info-panel").innerHTML = html;
           document.getElementById("info-panel").classList.add("show");
         });
       });
 
-      map.addListener("click", () => {
-        document.getElementById("info-panel").classList.remove("show");
-      });
+      map.addListener("click", () => document.getElementById("info-panel").classList.remove("show"));
     }
   </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGkKq-mR_Yb1xYsGDNJqJQaxQekWzWyOQ&callback=initMap"></script>
