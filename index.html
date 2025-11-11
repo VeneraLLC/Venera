@@ -4,28 +4,27 @@
   <title>Ultra Pure White Semi-Gloss Enamel Exterior Paint & Primer - Store Locations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <style>
-    body { margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 16px; }
-    #map { width: 100%; height: 100vh; }
-    h3 { font-size: 1.5em; padding: 10px; text-align: center; margin: 0; }
-    #location-button {
-      position: absolute; top: 10px; left: 10px; z-index: 1000;
-      padding: 10px; background: white; border: 2px solid #ccc;
-      border-radius: 4px; cursor: pointer; font-size: 1em;
+    body{margin:0;padding:0;font-size:16px;font-family:Arial,sans-serif}
+    #map{width:100%;height:100vh}
+    h3{font-size:1.5em;padding:10px;text-align:center;margin:0}
+    #location-button{
+      position:absolute;top:10px;left:10px;z-index:1000;
+      padding:10px;background:#fff;border:2px solid #ccc;border-radius:4px;
+      cursor:pointer;font-size:1em
     }
-    #info-panel {
-      position: absolute; top: 50px; left: 10px; z-index: 1000;
-      background: white; border: 2px solid #ccc; border-radius: 4px;
-      padding: 10px; max-height: 200px; overflow-y: auto;
-      display: none; width: 250px;
+    #info-panel{
+      position:absolute;top:50px;left:10px;z-index:1000;
+      background:#fff;border:2px solid #ccc;border-radius:4px;
+      padding:10px;max-height:200px;overflow-y:auto;display:none;width:250px
     }
-    #info-panel.show { display: block; }
-    a { color: #1a73e8; text-decoration: none; margin-left: 5px; }
-    a:hover { text-decoration: underline; }
-    @media (max-width: 768px) {
-      h3 { font-size: 1.2em; }
-      #map { height: 50vh; }
-      #location-button { padding: 5px; font-size: 0.8em; }
-      #info-panel { top: 45px; width: 80%; left: 10%; max-height: 150px; font-size: 0.9em; }
+    #info-panel.show{display:block}
+    a{color:#1a73e8;text-decoration:none;margin-left:5px}
+    a:hover{text-decoration:underline}
+    @media(max-width:768px){
+      h3{font-size:1.2em}
+      #map{height:50vh}
+      #location-button{padding:5px;font-size:0.8em}
+      #info-panel{top:45px;width:80%;left:10%;max-height:150px;font-size:0.9em}
     }
   </style>
 </head>
@@ -36,132 +35,91 @@
   <div id="map"></div>
 
   <script>
+    let map, userMarker;
+
     function initMap() {
-      const map = new google.maps.Map(document.getElementById("map"), {
+      map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
-        center: { lat: 37.5407, lng: -77.4360 },
+        center: { lat: 37.5407, lng: -77.4360 }, // Richmond, VA
         gestureHandling: 'greedy',
         mapTypeControl: false,
         streetViewControl: false
       });
 
-      let currentLocationMarker = null;
-      let watchId = null;
-
-      function centerOnCurrentLocation() {
-        if (navigator.geolocation) {
-          if (watchId) navigator.geolocation.clearWatch(watchId);
-          watchId = navigator.geolocation.watchPosition(
-            (position) => {
-              const userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-              map.panTo(userLocation);
-              map.setZoom(10);
-              if (currentLocationMarker) {
-                currentLocationMarker.setPosition(userLocation);
-              } else {
-                currentLocationMarker = new google.maps.Marker({
-                  position: userLocation,
-                  map: map,
-                  icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                  title: "You Are Here"
-                });
-              }
-            },
-            (error) => alert("Location error: " + error.message),
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-          );
-        } else {
-          alert("Geolocation not supported.");
+      document.getElementById("location-button").addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          alert("Geolocation is not supported by this browser.");
+          return;
         }
-      }
-
-      document.getElementById("location-button").addEventListener("click", centerOnCurrentLocation);
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            map.panTo(loc);
+            map.setZoom(12);
+            if (userMarker) userMarker.setPosition(loc);
+            else {
+              userMarker = new google.maps.Marker({
+                position: loc,
+                map: map,
+                icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                title: "You Are Here"
+              });
+            }
+          },
+          err => alert("Location error: " + err.message),
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
 
       function getDirections(address) {
-        const encoded = encodeURIComponent(address);
-        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encoded}`, '_blank');
+        const enc = encodeURIComponent(address);
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${enc}`, '_blank');
       }
 
       const stores = [
-        // === FIRST BLOCK: 25 STORES ===
-        { address: "7251 Bell Creek Rd, Mechanicsville VA", title: "Store #4624", info: "Store #4624<br>7251 Bell Creek Rd, Mechanicsville VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"7251 Bell Creek Rd, Mechanicsville VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 4 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 37.6078, lng: -77.3747 } },
-        { address: "6501 W Broad St, Richmond VA", title: "Store #4632", info: "Store #4632<br>6501 W Broad St, Richmond VA<br>Price: $144.00<br>Stock: 1 <a href='#' onclick='getDirections(\"6501 W Broad St, Richmond VA\"); return false;'>Get Directions</a><br>Location: Aisle 6 - Bay 12<br>Distance: 5 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.5985, lng: -77.5166 } },
-        { address: "10233 Lakeridge Parkway, Ashland VA", title: "Store #4653", info: "Store #4653<br>10233 Lakeridge Parkway, Ashland VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"10233 Lakeridge Parkway, Ashland VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 8 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 37.7089, lng: -77.4594 } },
-        { address: "1386 Car Mia Way, Richmond VA", title: "Store #4631", info: "Store #4631<br>1386 Car Mia Way, Richmond VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"1386 Car Mia Way, Richmond VA\"); return false;'>Get Directions</a><br>Location: Aisle 7 - Bay 11<br>Distance: 11 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.5057, lng: -77.6087 } },
-        { address: "11260 W Broad St, Glen Allen VA", title: "Store #4611", info: "Store #4611<br>11260 W Broad St, Glen Allen VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"11260 W Broad St, Glen Allen VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 11 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.6521, lng: -77.5668 } },
-        { address: "12300 Chattanooga Plaza, Midlothian VA", title: "Store #4627", info: "Store #4627<br>12300 Chattanooga Plaza, Midlothian VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"12300 Chattanooga Plaza, Midlothian VA\"); return false;'>Get Directions</a><br>Location: Aisle 6 - Bay 13<br>Distance: 15 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.4505, lng: -77.6488 } },
-        { address: "12300 Jefferson Davis Hwy, Chester VA", title: "Store #4616", info: "Store #4616<br>12300 Jefferson Davis Hwy, Chester VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"12300 Jefferson Davis Hwy, Chester VA\"); return false;'>Get Directions</a><br>Location: Aisle 7 - Bay 11<br>Distance: 15 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.3628, lng: -77.4337 } },
-        { address: "2600 Conduit Rd, Colonial Heights VA", title: "Store #4633", info: "Store #4633<br>2600 Conduit Rd, Colonial Heights VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"2600 Conduit Rd, Colonial Heights VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 22 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.2597, lng: -77.4289 } },
-        { address: "6700 Mooretown Rd, Williamsburg VA", title: "Store #4635", info: "Store #4635<br>6700 Mooretown Rd, Williamsburg VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"6700 Mooretown Rd, Williamsburg VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 41 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 37.3058, lng: -76.7355 } },
-        { address: "1201 Gateway Blvd, Fredericksburg VA", title: "Store #4620", info: "Store #4620<br>1201 Gateway Blvd, Fredericksburg VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"1201 Gateway Blvd, Fredericksburg VA\"); return false;'>Get Directions</a><br>Location: Aisle 7 - Bay 12<br>Distance: 50 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.3055, lng: -77.4578 } },
-        { address: "5771 Plank Road, Fredericksburg VA", title: "Store #4660", info: "Store #4660<br>5771 Plank Road, Fredericksburg VA<br>Price: $288.00<br>Stock: 4 <a href='#' onclick='getDirections(\"5771 Plank Road, Fredericksburg VA\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 12<br>Distance: 50 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.2953, lng: -77.5087 } },
-        { address: "6921 Walton Lane, Gloucester VA", title: "Store #4650", info: "Store #4650<br>6921 Walton Lane, Gloucester VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"6921 Walton Lane, Gloucester VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 51 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 37.6248, lng: -76.4095 } },
-        { address: "325 Chatham Dr, Newport News VA", title: "Store #4613", info: "Store #4613<br>325 Chatham Dr, Newport News VA<br>Price: $262.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"325 Chatham Dr, Newport News VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 59 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 37.1264, lng: -76.4993 } },
-        { address: "305 Worth Avenue, Stafford VA", title: "Store #4637", info: "Store #4637<br>305 Worth Avenue, Stafford VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"305 Worth Avenue, Stafford VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 62 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 38.4034, lng: -77.4112 } },
-        { address: "1413 N Armistead Ave, Hampton VA", title: "Store #4612", info: "Store #4612<br>1413 N Armistead Ave, Hampton VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"1413 N Armistead Ave, Hampton VA\"); return false;'>Get Directions</a><br>Location: Aisle 8 - Bay 11<br>Distance: 69 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 37.0528, lng: -76.3897 } },
-        { address: "250 Frank D Harris Dr, South Hill VA", title: "Store #4659", info: "Store #4659<br>250 Frank D Harris Dr, South Hill VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"250 Frank D Harris Dr, South Hill VA\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 11<br>Distance: 71 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 36.5861, lng: -78.4791 } },
-        { address: "14025 Foulger Square, Woodbridge VA", title: "Store #4604", info: "Store #4604<br>14025 Foulger Square, Woodbridge VA<br>Price: $288.00<br>Stock: 4 <a href='#' onclick='getDirections(\"14025 Foulger Square, Woodbridge VA\"); return false;'>Get Directions</a><br>Location: Aisle 41 - Bay 13<br>Distance: 75 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.6255, lng: -77.2716 } },
-        { address: "2421 Old Taylor Rd, Chesapeake VA", title: "Store #4622", info: "Store #4622<br>2421 Old Taylor Rd, Chesapeake VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"2421 Old Taylor Rd, Chesapeake VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 76 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 36.6856, lng: -76.2345 } },
-        { address: "12050 Jefferson Farm Pl, Waldorf MD", title: "Store #2563", info: "Store #2563<br>12050 Jefferson Farm Pl, Waldorf MD<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"12050 Jefferson Farm Pl, Waldorf MD\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 80 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.6166, lng: -76.6269 } },
-        { address: "267 Alwington Blvd, Warrenton VA", title: "Store #8552", info: "Store #8552<br>267 Alwington Blvd, Warrenton VA<br>Price: $288.00<br>Stock: 15 <a href='#' onclick='getDirections(\"267 Alwington Blvd, Warrenton VA\"); return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 12<br>Distance: 80 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.6789, lng: -77.7812 } },
-        { address: "8805 Liberia Ave, Manassas VA", title: "Store #4648", info: "Store #4648<br>8805 Liberia Ave, Manassas VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"8805 Liberia Ave, Manassas VA\"); return false;'>Get Directions</a><br>Location: Aisle 42 - Bay 10<br>Distance: 82 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.6807, lng: -77.3177 } },
-        { address: "1261 N Military Hwy, Norfolk VA", title: "Store #4615", info: "Store #4615<br>1261 N Military Hwy, Norfolk VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"1261 N Military Hwy, Norfolk VA\"); return false;'>Get Directions</a><br>Location: Aisle 7 - Bay 13<br>Distance: 83 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 36.8529, lng: -76.1923 } },
-        { address: "7710 Richmond Hwy, Alexandria VA", title: "Store #4638", info: "Store #4638<br>7710 Richmond Hwy, Alexandria VA<br>Price: $288.00<br>Stock: 7 <a href='#' onclick='getDirections(\"7710 Richmond Hwy, Alexandria VA\"); return false;'>Get Directions</a><br>Location: Aisle 8 - Bay 14<br>Distance: 83 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.7358, lng: -77.0675 } },
-        { address: "6691 Frontier Rd, Springfield VA", title: "Store #4617", info: "Store #4617<br>6691 Frontier Rd, Springfield VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"6691 Frontier Rd, Springfield VA\"); return false;'>Get Directions</a><br>Location: Aisle 2 - Bay 17<br>Distance: 84 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8027, lng: -77.1369 } },
-        { address: "7486 Stream Walk Ln, Manassas VA", title: "Store #4607", info: "Store #4607<br>7486 Stream Walk Ln, Manassas VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"7486 Stream Walk Ln, Manassas VA\"); return false;'>Get Directions</a><br>Location: Aisle 6 - Bay 15<br>Distance: 85 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.6647, lng: -77.2502 } },
-
-        // === SECOND BLOCK: 25 MORE STORES ===
-        { address: "1400 Tintern Ln, Chesapeake VA", title: "Store #4619", info: "Store #4619<br>1400 Tintern Ln, Chesapeake VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"1400 Tintern Ln, Chesapeake VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 85 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 36.6778, lng: -76.2345 } },
-        { address: "400 S Pickett St, Alexandria VA", title: "Store #4603", info: "Store #4603<br>400 S Pickett St, Alexandria VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"400 S Pickett St, Alexandria VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 87 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 38.7916, lng: -77.0769 } },
-        { address: "15450 John Marshall Hwy, Haymarket VA", title: "Store #4213", info: "Store #4213<br>15450 John Marshall Hwy, Haymarket VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"15450 John Marshall Hwy, Haymarket VA\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 12<br>Distance: 87 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.7666, lng: -77.2837 } },
-        { address: "6555 Little River Tpke, Alexandria VA", title: "Store #4640", info: "Store #4640<br>6555 Little River Tpke, Alexandria VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"6555 Little River Tpke, Alexandria VA\"); return false;'>Get Directions</a><br>Location: Aisle 10 - Bay 14<br>Distance: 87 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8087, lng: -77.0865 } },
-        { address: "12275 Price Club Plaza, Fairfax VA", title: "Store #4601", info: "Store #4601<br>12275 Price Club Plaza, Fairfax VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"12275 Price Club Plaza, Fairfax VA\"); return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 12<br>Distance: 88 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8467, lng: -77.3067 } },
-        { address: "6003 Oxon Hill Rd, Oxon Hill MD", title: "Store #2554", info: "Store #2554<br>6003 Oxon Hill Rd, Oxon Hill MD<br>Price: $288.00<br>Stock: 1 <a href='#' onclick='getDirections(\"6003 Oxon Hill Rd, Oxon Hill MD\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 8<br>Distance: 89 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8486, lng: -76.8887 } },
-        { address: "31 Windigrove Rd, Waynesboro VA", title: "Store #4654", info: "Store #4654<br>31 Windigrove Rd, Waynesboro VA<br>Price: $288.00<br>Stock: 4 <a href='#' onclick='getDirections(\"31 Windigrove Rd, Waynesboro VA\"); return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 11<br>Distance: 89 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.0722, lng: -78.8972 } },
-        { address: "3352 Virginia Beach Blvd, Virginia Beach VA", title: "Store #4614", info: "Store #4614<br>3352 Virginia Beach Blvd, Virginia Beach VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"3352 Virginia Beach Blvd, Virginia Beach VA\"); return false;'>Get Directions</a><br>Location: Aisle 7 - Bay 12<br>Distance: 89 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 36.8097, lng: -76.0737 } },
-        { address: "3201 Blenheim Boulevard, Fairfax VA", title: "Store #4639", info: "Store #4639<br>3201 Blenheim Boulevard, Fairfax VA<br>Price: $288.00<br>Stock: 4 <a href='#' onclick='getDirections(\"3201 Blenheim Boulevard, Fairfax VA\"); return false;'>Get Directions</a><br>Location: Aisle 4 - Bay 11<br>Distance: 89 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8295, lng: -77.3027 } },
-        { address: "2020 Lynnhaven Pkwy, Virginia Beach VA", title: "Store #4626", info: "Store #4626<br>2020 Lynnhaven Pkwy, Virginia Beach VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"2020 Lynnhaven Pkwy, Virginia Beach VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 90 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 36.7431, lng: -76.0552 } },
-        { address: "2815 Merrilee Dr, Fairfax VA", title: "Store #4605", info: "Store #4605<br>2815 Merrilee Dr, Fairfax VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"2815 Merrilee Dr, Fairfax VA\"); return false;'>Get Directions</a><br>Location: Aisle 8 - Bay 4<br>Distance: 90 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8367, lng: -77.3053 } },
-        { address: "6210 Seven Corners Ctr, Falls Church VA", title: "Store #4608", info: "Store #4608<br>6210 Seven Corners Ctr, Falls Church VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"6210 Seven Corners Ctr, Falls Church VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 91 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8742, lng: -77.1528 } },
-        { address: "157 Hillcrest Pkwy, Chesapeake VA", title: "Store #4656", info: "Store #4656<br>157 Hillcrest Pkwy, Chesapeake VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"157 Hillcrest Pkwy, Chesapeake VA\"); return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 12<br>Distance: 92 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 36.6602, lng: -76.2345 } },
-        { address: "25000 Riding Plaza, Chantilly VA", title: "Store #8551", info: "Store #8551<br>25000 Riding Plaza, Chantilly VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"25000 Riding Plaza, Chantilly VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 94 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8963, lng: -77.4291 } },
-        { address: "15410 Chrysler Drive, Upper Marlboro MD", title: "Store #8550", info: "Store #8550<br>15410 Chrysler Drive, Upper Marlboro MD<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"15410 Chrysler Drive, Upper Marlboro MD\"); return false;'>Get Directions</a><br>Location: Aisle 45 - Bay 14<br>Distance: 94 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.7947, lng: -76.9237 } },
-        { address: "150 Hampton Park Blvd, Capitol Heights MD", title: "Store #2555", info: "Store #2555<br>150 Hampton Park Blvd, Capitol Heights MD<br>Price: $288.00<br>Stock: 7 <a href='#' onclick='getDirections(\"150 Hampton Park Blvd, Capitol Heights MD\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 13<br>Distance: 96 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.8976, lng: -76.9477 } },
-        { address: "901 Rhode Island Ave Ne, Washington DC", title: "Store #2583", info: "Store #2583<br>901 Rhode Island Ave Ne, Washington DC<br>Price: $288.00<br>Stock: 5 <a href='#' onclick='getDirections(\"901 Rhode Island Ave Ne, Washington DC\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 18<br>Distance: 96 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.9047, lng: -77.0367 } },
-        { address: "2324 Elson Green Ave., Virginia Beach VA", title: "Store #4643", info: "Store #4643<br>2324 Elson Green Ave., Virginia Beach VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"2324 Elson Green Ave., Virginia Beach VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 96 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 36.8342, lng: -76.1268 } },
-        { address: "1651 Reston Parkway, Reston VA", title: "Store #4641", info: "Store #4641<br>1651 Reston Parkway, Reston VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"1651 Reston Parkway, Reston VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 96 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 38.9746, lng: -77.4087 } },
-        { address: "121 Burgess Rd, Harrisonburg VA", title: "Store #4645", info: "Store #4645<br>121 Burgess Rd, Harrisonburg VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"121 Burgess Rd, Harrisonburg VA\"); return false;'>Get Directions</a><br>Location: Aisle 38 - Bay 10<br>Distance: 98 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.4083, lng: -78.9064 } },
-        { address: "43675 Greenway Corp Dr, Ashburn VA", title: "Store #4647", info: "Store #4647<br>43675 Greenway Corp Dr, Ashburn VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"43675 Greenway Corp Dr, Ashburn VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 99 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 39.1166, lng: -77.5387 } },
-        { address: "3301 E West Hwy, Hyattsville MD", title: "Store #2564", info: "Store #2564<br>3301 E West Hwy, Hyattsville MD<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"3301 E West Hwy, Hyattsville MD\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 13<br>Distance: 99 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 38.9696, lng: -76.9377 } },
-        { address: "7902 Graves Mill Road, Lynchburg VA", title: "Store #4655", info: "Store #4655<br>7902 Graves Mill Road, Lynchburg VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"7902 Graves Mill Road, Lynchburg VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 99 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 37.3769, lng: -79.1922 } },
-        { address: "10301 M L King Jr. Hwy, Lanham MD", title: "Store #8548", info: "Store #8548<br>10301 M L King Jr. Hwy, Lanham MD<br>Price: $288.00<br>Stock: 1 <a href='#' onclick='getDirections(\"10301 M L King Jr. Hwy, Lanham MD\"); return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 14<br>Distance: 101 miles", icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", position: { lat: 39.0287, lng: -76.9076 } },
-        { address: "46261 Cranston Way, Sterling VA", title: "Store #4602", info: "Store #4602<br>46261 Cranston Way, Sterling VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"46261 Cranston Way, Sterling VA\"); return false;'>Get Directions</a><br>Location: N/A<br>Distance: 101 miles", icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", position: { lat: 39.0386, lng: -77.4022 } }
+        {address:"1400 Tintern Ln, Chesapeake VA",title:"Store #4619",info:"Store #4619<br>1400 Tintern Ln, Chesapeake VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"1400 Tintern Ln, Chesapeake VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 85 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:36.6778,lng:-76.2345}},
+        {address:"400 S Pickett St, Alexandria VA",title:"Store #4603",info:"Store #4603<br>400 S Pickett St, Alexandria VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"400 S Pickett St, Alexandria VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 87 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:38.7916,lng:-77.0769}},
+        {address:"15450 John Marshall Hwy, Haymarket VA",title:"Store #4213",info:"Store #4213<br>15450 John Marshall Hwy, Haymarket VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"15450 John Marshall Hwy, Haymarket VA\");return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 12<br>Distance: 87 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.7666,lng:-77.2837}},
+        {address:"6555 Little River Tpke, Alexandria VA",title:"Store #4640",info:"Store #4640<br>6555 Little River Tpke, Alexandria VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"6555 Little River Tpke, Alexandria VA\");return false;'>Get Directions</a><br>Location: Aisle 10 - Bay 14<br>Distance: 87 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8087,lng:-77.0865}},
+        {address:"12275 Price Club Plaza, Fairfax VA",title:"Store #4601",info:"Store #4601<br>12275 Price Club Plaza, Fairfax VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"12275 Price Club Plaza, Fairfax VA\");return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 12<br>Distance: 88 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8467,lng:-77.3067}},
+        {address:"6003 Oxon Hill Rd, Oxon Hill MD",title:"Store #2554",info:"Store #2554<br>6003 Oxon Hill Rd, Oxon Hill MD<br>Price: $288.00<br>Stock: 1 <a href='#' onclick='getDirections(\"6003 Oxon Hill Rd, Oxon Hill MD\");return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 8<br>Distance: 89 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8486,lng:-76.8887}},
+        {address:"31 Windigrove Rd, Waynesboro VA",title:"Store #4654",info:"Store #4654<br>31 Windigrove Rd, Waynesboro VA<br>Price: $288.00<br>Stock: 4 <a href='#' onclick='getDirections(\"31 Windigrove Rd, Waynesboro VA\");return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 11<br>Distance: 89 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.0722,lng:-78.8972}},
+        {address:"3352 Virginia Beach Blvd, Virginia Beach VA",title:"Store #4614",info:"Store #4614<br>3352 Virginia Beach Blvd, Virginia Beach VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"3352 Virginia Beach Blvd, Virginia Beach VA\");return false;'>Get Directions</a><br>Location: Aisle 7 - Bay 12<br>Distance: 89 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:36.8097,lng:-76.0737}},
+        {address:"3201 Blenheim Boulevard, Fairfax VA",title:"Store #4639",info:"Store #4639<br>3201 Blenheim Boulevard, Fairfax VA<br>Price: $288.00<br>Stock: 4 <a href='#' onclick='getDirections(\"3201 Blenheim Boulevard, Fairfax VA\");return false;'>Get Directions</a><br>Location: Aisle 4 - Bay 11<br>Distance: 89 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8295,lng:-77.3027}},
+        {address:"2020 Lynnhaven Pkwy, Virginia Beach VA",title:"Store #4626",info:"Store #4626<br>2020 Lynnhaven Pkwy, Virginia Beach VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"2020 Lynnhaven Pkwy, Virginia Beach VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 90 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:36.7431,lng:-76.0552}},
+        {address:"2815 Merrilee Dr, Fairfax VA",title:"Store #4605",info:"Store #4605<br>2815 Merrilee Dr, Fairfax VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"2815 Merrilee Dr, Fairfax VA\");return false;'>Get Directions</a><br>Location: Aisle 8 - Bay 4<br>Distance: 90 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8367,lng:-77.3053}},
+        {address:"6210 Seven Corners Ctr, Falls Church VA",title:"Store #4608",info:"Store #4608<br>6210 Seven Corners Ctr, Falls Church VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"6210 Seven Corners Ctr, Falls Church VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 91 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8742,lng:-77.1528}},
+        {address:"157 Hillcrest Pkwy, Chesapeake VA",title:"Store #4656",info:"Store #4656<br>157 Hillcrest Pkwy, Chesapeake VA<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"157 Hillcrest Pkwy, Chesapeake VA\");return false;'>Get Directions</a><br>Location: Aisle 43 - Bay 12<br>Distance: 92 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:36.6602,lng:-76.2345}},
+        {address:"25000 Riding Plaza, Chantilly VA",title:"Store #8551",info:"Store #8551<br>25000 Riding Plaza, Chantilly VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"25000 Riding Plaza, Chantilly VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 94 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8963,lng:-77.4291}},
+        {address:"15410 Chrysler Drive, Upper Marlboro MD",title:"Store #8550",info:"Store #8550<br>15410 Chrysler Drive, Upper Marlboro MD<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"15410 Chrysler Drive, Upper Marlboro MD\");return false;'>Get Directions</a><br>Location: Aisle 45 - Bay 14<br>Distance: 94 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.7947,lng:-76.9237}},
+        {address:"150 Hampton Park Blvd, Capitol Heights MD",title:"Store #2555",info:"Store #2555<br>150 Hampton Park Blvd, Capitol Heights MD<br>Price: $288.00<br>Stock: 7 <a href='#' onclick='getDirections(\"150 Hampton Park Blvd, Capitol Heights MD\");return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 13<br>Distance: 96 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.8976,lng:-76.9477}},
+        {address:"901 Rhode Island Ave Ne, Washington DC",title:"Store #2583",info:"Store #2583<br>901 Rhode Island Ave Ne, Washington DC<br>Price: $288.00<br>Stock: 5 <a href='#' onclick='getDirections(\"901 Rhode Island Ave Ne, Washington DC\");return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 18<br>Distance: 96 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.9047,lng:-77.0367}},
+        {address:"2324 Elson Green Ave., Virginia Beach VA",title:"Store #4643",info:"Store #4643<br>2324 Elson Green Ave., Virginia Beach VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"2324 Elson Green Ave., Virginia Beach VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 96 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:36.8342,lng:-76.1268}},
+        {address:"1651 Reston Parkway, Reston VA",title:"Store #4641",info:"Store #4641<br>1651 Reston Parkway, Reston VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"1651 Reston Parkway, Reston VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 96 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:38.9746,lng:-77.4087}},
+        {address:"121 Burgess Rd, Harrisonburg VA",title:"Store #4645",info:"Store #4645<br>121 Burgess Rd, Harrisonburg VA<br>Price: $288.00<br>Stock: 3 <a href='#' onclick='getDirections(\"121 Burgess Rd, Harrisonburg VA\");return false;'>Get Directions</a><br>Location: Aisle 38 - Bay 10<br>Distance: 98 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.4083,lng:-78.9064}},
+        {address:"43675 Greenway Corp Dr, Ashburn VA",title:"Store #4647",info:"Store #4647<br>43675 Greenway Corp Dr, Ashburn VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"43675 Greenway Corp Dr, Ashburn VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 99 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:39.1166,lng:-77.5387}},
+        {address:"3301 E West Hwy, Hyattsville MD",title:"Store #2564",info:"Store #2564<br>3301 E West Hwy, Hyattsville MD<br>Price: $288.00<br>Stock: 2 <a href='#' onclick='getDirections(\"3301 E West Hwy, Hyattsville MD\");return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 13<br>Distance: 99 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:38.9696,lng:-76.9377}},
+        {address:"7902 Graves Mill Road, Lynchburg VA",title:"Store #4655",info:"Store #4655<br>7902 Graves Mill Road, Lynchburg VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"7902 Graves Mill Road, Lynchburg VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 99 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:37.3769,lng:-79.1922}},
+        {address:"10301 M L King Jr. Hwy, Lanham MD",title:"Store #8548",info:"Store #8548<br>10301 M L King Jr. Hwy, Lanham MD<br>Price: $288.00<br>Stock: 1 <a href='#' onclick='getDirections(\"10301 M L King Jr. Hwy, Lanham MD\");return false;'>Get Directions</a><br>Location: Aisle 5 - Bay 14<br>Distance: 101 miles",icon:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",position:{lat:39.0287,lng:-76.9076}},
+        {address:"46261 Cranston Way, Sterling VA",title:"Store #4602",info:"Store #4602<br>46261 Cranston Way, Sterling VA<br>Price: $27.00 (Restock)<br>Stock: 0 <a href='#' onclick='getDirections(\"46261 Cranston Way, Sterling VA\");return false;'>Get Directions</a><br>Location: N/A<br>Distance: 101 miles",icon:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",position:{lat:39.0386,lng:-77.4022}}
       ];
 
-      stores.forEach(store => {
-        const marker = new google.maps.Marker({
-          position: store.position,
+      stores.forEach(s => {
+        const m = new google.maps.Marker({
+          position: s.position,
           map: map,
-          title: store.title,
-          icon: store.icon
+          title: s.title,
+          icon: s.icon
         });
-
-        const infoWindow = new google.maps.InfoWindow({
-          content: store.info,
-          maxWidth: 240
-        });
-
-        marker.addListener("click", () => {
-          infoWindow.open(map, marker);
-          const panel = document.getElementById("info-panel");
-          panel.innerHTML = store.info;
-          panel.classList.add("show");
+        const iw = new google.maps.InfoWindow({content: s.info, maxWidth: 260});
+        m.addListener("click", () => {
+          iw.open(map, m);
+          document.getElementById("info-panel").innerHTML = s.info;
+          document.getElementById("info-panel").classList.add("show");
         });
       });
 
-      map.addListener("click", () => {
-        document.getElementById("info-panel").classList.remove("show");
-      });
+      map.addListener("click", () => document.getElementById("info-panel").classList.remove("show"));
     }
   </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGkKq-mR_Yb1xYsGDNJqJQaxQekWzWyOQ&callback=initMap"></script>
