@@ -61,7 +61,6 @@
         launchDirections(address);
         return;
       }
-      // Show banner the first time
       banner.classList.add('show');
       allowBtn.onclick = () => {
         directionsAllowed = true;
@@ -73,10 +72,18 @@
     function launchDirections(address) {
       const clean = address.replace(/&/g, '%26').trim();
       const enc = encodeURIComponent(clean);
-      const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (mobile) {
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      const isMobile = isIOS || isAndroid;
+
+      if (isIOS) {
+        // iOS: Use Apple Maps – 100% reliable
+        window.location.href = `http://maps.apple.com/?q=${enc}`;
+      } else if (isAndroid) {
+        // Android: Use geo: URI
         window.location.href = `geo:0,0?q=${enc}`;
       } else {
+        // Desktop: Google Maps
         window.open(`https://www.google.com/maps/dir/?api=1&destination=${enc}`, '_blank');
       }
     }
@@ -86,7 +93,7 @@
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
         center: { lat: 37.5407, lng: -77.4360 },
-        gestureNeeded: 'greedy',
+        gestureHandling: 'greedy',
         mapTypeControl: false,
         streetViewControl: false
       });
