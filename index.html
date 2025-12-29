@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Supreme Seal Clear High Gloss – Nationwide Live Map (Nov 29)</title>
+  <title>Supreme Seal Clear High Gloss – Nationwide Live Map (Dec 29)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <style>
     body{margin:0;padding:0;font-family:Arial,sans-serif}
@@ -19,7 +19,7 @@
   </style>
 </head>
 <body>
-  <h3>5 gal Supreme Seal Clear High Gloss Concrete Sealer<br><small>Green = In Stock • Orange = Restock Imminent (≤$149) • 99 Stores – Nov 29</small></h3>
+  <h3>5 gal Supreme Seal Clear High Gloss Concrete Sealer<br><small>Green = In Stock • Orange = Restock Imminent (≤$149) • 99 Stores – Dec 29</small></h3>
   <button id="location-button">Center on Current Location</button>
   <div id="info-panel"></div>
   <div id="allow-banner"><span>This site wants to open directions in your maps app.</span> <button id="allow-btn">Allow</button></div>
@@ -53,7 +53,7 @@
     function initMap() {
       map = new google.maps.Map(document.getElementById("map"), {
         zoom: 7,
-        center: { lat: 37.8, lng: -79.0 },
+        center: { lat: 37.0, lng: -78.0 },
         gestureHandling: 'greedy',
         mapTypeControl: false,
         streetViewControl: false
@@ -73,53 +73,55 @@
 
       const stores = [
         // IN STOCK (Green)
-        {lat:37.291,lng:-76.745,title:"#4635 Williamsburg VA",addr:"6700 Mooretown Rd, Williamsburg VA",price:"$149",stock:14},
-        {lat:37.091,lng:-76.489,title:"#4613 Newport News VA",addr:"325 Chatham Dr, Newport News VA",price:"$149",stock:7},
-        {lat:37.050,lng:-76.385,title:"#4612 Hampton VA",addr:"1413 N Armistead Ave, Hampton VA",price:"$149",stock:10},
+        {lat:37.291,lng:-76.745,title:"#4635 Williamsburg VA",addr:"6700 Mooretown Rd, Williamsburg VA",price:"$149",stock:3},
+        {lat:37.091,lng:-76.489,title:"#4613 Newport News VA",addr:"325 Chatham Dr, Newport News VA",price:"$149",stock:2},
         {lat:36.776,lng:-76.285,title:"#4622 Chesapeake VA",addr:"2421 Old Taylor Rd, Chesapeake VA",price:"$149",stock:6},
         {lat:36.678,lng:-76.235,title:"#4619 Chesapeake VA",addr:"1400 Tintern Ln, Chesapeake VA",price:"$149",stock:10},
-        {lat:36.810,lng:-76.074,title:"#4614 Virginia Beach VA",addr:"3352 Virginia Beach Blvd, Virginia Beach VA",price:"$149",stock:12},
+        {lat:36.810,lng:-76.074,title:"#4614 Virginia Beach VA",addr:"3352 Virginia Beach Blvd, Virginia Beach VA",price:"$149",stock:11},
         {lat:36.743,lng:-76.055,title:"#4626 Virginia Beach VA",addr:"2020 Lynnhaven Pkwy, Virginia Beach VA",price:"$149",stock:22},
-        {lat:36.834,lng:-76.127,title:"#4643 Virginia Beach VA",addr:"2324 Elson Green Ave., Virginia Beach VA",price:"$149",stock:12},
-        {lat:36.871,lng:-76.209,title:"#4615 Norfolk VA",addr:"1261 N Military Hwy, Norfolk VA",price:"$149",stock:12},
-        {lat:36.054,lng:-79.506,title:"#3605 Greensboro NC",addr:"3215 Brassfield Rd, Greensboro NC",price:"$149",stock:4},
+        {lat:36.834,lng:-76.127,title:"#4643 Virginia Beach VA",addr:"2324 Elson Green Ave., Virginia Beach VA",price:"$149",stock:3},
+        {lat:36.871,lng:-76.209,title:"#4615 Norfolk VA",addr:"1261 N Military Hwy, Norfolk VA",price:"$149",stock:3},
+        {lat:36.054,lng:-79.506,title:"#3605 Greensboro NC",addr:"3215 Brassfield Rd, Greensboro NC",price:"$149",stock:3},
         {lat:35.908,lng:-78.956,title:"#3644 Apex NC",addr:"1000 Vision Dr, Apex NC",price:"$149",stock:1},
-        {lat:35.905,lng:-78.681,title:"#3615 Cary NC",addr:"2031 Walnut St, Cary NC",price:"$149",stock:5},
-        {lat:35.914,lng:-78.583,title:"#3634 Raleigh NC",addr:"9517 Strickland Rd, Raleigh NC",price:"$149",stock:8},
+        {lat:35.905,lng:-78.681,title:"#3615 Cary NC",addr:"2031 Walnut St, Cary NC",price:"$149",stock:3},
+        {lat:35.914,lng:-78.583,title:"#3634 Raleigh NC",addr:"9517 Strickland Rd, Raleigh NC",price:"$149",stock:3},
         {lat:36.100,lng:-78.957,title:"#3616 Raleigh NC",addr:"4901 Capital Blvd, Raleigh NC",price:"$149",stock:5},
-        {lat:36.230,lng:-78.800,title:"#3647 Wake Forest NC",addr:"11915 Retail Dr, Wake Forest NC",price:"$149",stock:11},
-        {lat:35.893,lng:-78.519,title:"#3663 Knightdale NC",addr:"1020 Shoppes At Midway Dr, Knightdale NC",price:"$149",stock:7},
+        {lat:36.230,lng:-78.800,title:"#3647 Wake Forest NC",addr:"11915 Retail Dr, Wake Forest NC",price:"$149",stock:3},
+        {lat:35.893,lng:-78.519,title:"#3663 Knightdale NC",addr:"1020 Shoppes At Midway Dr, Knightdale NC",price:"$149",stock:3},
         {lat:35.408,lng:-80.583,title:"#3638 Cornelius NC",addr:"17111 Statesville Rd, Cornelius NC",price:"$149",stock:22},
-        {lat:35.260,lng:-80.743,title:"#3639 Charlotte NC",addr:"9501 Albemarle Rd, Charlotte NC",price:"$149",stock:11},
+        {lat:35.260,lng:-80.743,title:"#3639 Charlotte NC",addr:"9501 Albemarle Rd, Charlotte NC",price:"$149",stock:6},
         {lat:35.135,lng:-80.935,title:"#3646 Charlotte NC",addr:"4750 South Boulevard, Charlotte NC",price:"$149",stock:10},
         {lat:35.213,lng:-80.862,title:"#3640 Charlotte NC",addr:"5415 Ballantyne Commons Pkwy, Charlotte NC",price:"$149",stock:9},
-        {lat:35.050,lng:-80.845,title:"#3601 Pineville NC",addr:"10210 Centrum Pkwy, Pineville NC",price:"$149",stock:5},
-        {lat:35.075,lng:-80.658,title:"#3608 Charlotte NC",addr:"1220 N Wendover Rd, Charlotte NC",price:"$149",stock:4},
-        {lat:34.975,lng:-81.025,title:"#1114 Rock Hill SC",addr:"2815 Home Depot Blvd, Rock Hill SC",price:"$149",stock:5},
+        {lat:35.050,lng:-80.845,title:"#3601 Pineville NC",addr:"10210 Centrum Pkwy, Pineville NC",price:"$149",stock:4},
+        {lat:35.075,lng:-80.658,title:"#3608 Charlotte NC",addr:"1220 N Wendover Rd, Charlotte NC",price:"$149",stock:2},
+        {lat:34.200,lng:-77.850,title:"#3629 Wilmington NC",addr:"210 Eastwood Rd, Wilmington NC",price:"$149",stock:6},
+        {lat:34.200,lng:-77.900,title:"#3609 Wilmington NC",addr:"5511 Carolina Beach Road, Wilmington NC",price:"$149",stock:3},
+        {lat:34.975,lng:-81.025,title:"#1114 Rock Hill SC",addr:"2815 Home Depot Blvd, Rock Hill SC",price:"$149",stock:4},
+        {lat:34.000,lng:-78.000,title:"#1121 North Myrtle Beach SC",addr:"620 Hwy 17 N, North Myrtle Beach SC",price:"$149",stock:4},
 
         // RESTOCK IMMINENT ≤$149 even if 0 stock (Orange)
         {lat:37.407,lng:-76.535,title:"#4650 Gloucester VA",addr:"6921 Walton Lane, Gloucester VA",price:"$31",stock:0},
         {lat:36.728,lng:-78.142,title:"#4659 South Hill VA",addr:"250 Frank D Harris Dr, South Hill VA",price:"$6.10",stock:0},
         {lat:36.660,lng:-76.235,title:"#4656 Chesapeake VA",addr:"157 Hillcrest Pkwy, Chesapeake VA",price:"$11",stock:0},
+        {lat:35.783,lng:-78.800,title:"#3631 Garner NC",addr:"2540 Timber Dr, Garner NC",price:"$6.10",stock:0},
+        {lat:35.583,lng:-78.800,title:"#3652 Fuquay Varina NC",addr:"901 E Broad St, Fuquay Varina NC",price:"$6.10",stock:0},
+        {lat:35.995,lng:-78.956,title:"#3620 Durham NC",addr:"3701 Mt Moriah Rd, Durham NC",price:"$6.10",stock:0},
+        {lat:36.016,lng:-78.956,title:"#3632 Durham NC",addr:"1700 N Pointe Dr, Durham NC",price:"$6.10",stock:0},
+        {lat:36.116,lng:-79.283,title:"#3661 Hillsborough NC",addr:"625 Hampton Point Blvd, Hillsborough NC",price:"$6.10",stock:0},
         {lat:36.116,lng:-79.956,title:"#3627 Burlington NC",addr:"2771-t Kirkwood Drive, Burlington NC",price:"$6.10",stock:0},
+        {lat:35.133,lng:-79.483,title:"#3626 Fayetteville NC",addr:"2060 Skibo Rd, Fayetteville NC",price:"$6.10",stock:0},
         {lat:36.072,lng:-79.800,title:"#3651 Greensboro NC",addr:"2912 S Elm Eugene St, Greensboro NC",price:"$6.10",stock:0},
         {lat:36.072,lng:-79.957,title:"#3604 Greensboro NC",addr:"4425 W Wendover Ave, Greensboro NC",price:"$6.10",stock:0},
         {lat:35.955,lng:-80.005,title:"#3633 High Point NC",addr:"2300 N Main St, High Point NC",price:"$6.10",stock:0},
-        {lat:36.116,lng:-79.283,title:"#3661 Hillsborough NC",addr:"625 Hampton Point Blvd, Hillsborough NC",price:"$6.10",stock:0},
-        {lat:35.995,lng:-78.956,title:"#3620 Durham NC",addr:"3701 Mt Moriah Rd, Durham NC",price:"$6.10",stock:0},
         {lat:36.116,lng:-80.283,title:"#3641 Winston Salem NC",addr:"5721 University Pkwy, Winston Salem NC",price:"$6.10",stock:0},
-        {lat:36.016,lng:-78.956,title:"#3632 Durham NC",addr:"1700 N Pointe Dr, Durham NC",price:"$6.10",stock:0},
-        {lat:35.583,lng:-78.800,title:"#3652 Fuquay Varina NC",addr:"901 E Broad St, Fuquay Varina NC",price:"$6.10",stock:0},
-        {lat:35.783,lng:-78.783,title:"#3631 Garner NC",addr:"2540 Timber Dr, Garner NC",price:"$6.10",stock:0},
-        {lat:35.616,lng:-80.816,title:"#3610 Winston Salem NC",addr:"1000 Hanes Mall Blvd, Winston Salem NC",price:"$31",stock:0},
+        {lat:36.016,lng:-80.016,title:"#3610 Winston Salem NC",addr:"1000 Hanes Mall Blvd, Winston Salem NC",price:"$31",stock:0},
         {lat:35.783,lng:-81.683,title:"#3628 Hickory NC",addr:"1530 8th Street Dr Se, Hickory NC",price:"$6.10",stock:0},
         {lat:35.266,lng:-81.033,title:"#3603 Charlotte NC",addr:"8135 University City Blvd, Charlotte NC",price:"$6.10",stock:0},
         {lat:35.116,lng:-80.716,title:"#3602 Matthews NC",addr:"1837 Matthews Township Pkwy, Matthews NC",price:"$6.70",stock:0},
         {lat:35.183,lng:-81.250,title:"#3606 Gastonia NC",addr:"2870 E Franklin Blvd, Gastonia NC",price:"$6.10",stock:0},
         {lat:35.083,lng:-80.983,title:"#3662 Charlotte NC",addr:"14310 Rivergate Parkway, Charlotte NC",price:"$6.10",stock:0},
         {lat:34.733,lng:-80.783,title:"#8913 Lancaster SC",addr:"1116 Highway 9 Byp W, Lancaster SC",price:"$6.10",stock:0},
-        {lat:35.616,lng:-81.233,title:"#3642 Statesville NC",addr:"240 Turnersburg Hwy, Statesville NC",price:"$6.10",stock:0},
-        {lat:35.133,lng:-79.483,title:"#3626 Fayetteville NC",addr:"2060 Skibo Rd, Fayetteville NC",price:"$6.10",stock:0}
+        {lat:35.616,lng:-81.233,title:"#3642 Statesville NC",addr:"240 Turnersburg Hwy, Statesville NC",price:"$6.10",stock:0}
       ];
 
       stores.forEach(s => {
