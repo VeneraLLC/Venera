@@ -10,6 +10,7 @@
     #location-button{position:absolute;top:60px;left:10px;z-index:1000;padding:10px;background:#fff;border:2px solid #ccc;border-radius:4px;cursor:pointer;font-size:1em;box-shadow:0 2px 6px rgba(0,0,0,.3)}
     #info-panel{position:absolute;top:110px;left:10px;z-index:1000;background:#fff;border:2px solid #ccc;border-radius:4px;padding:10px;max-height:240px;overflow-y:auto;display:none;width:290px;box-shadow:0 2px 6px rgba(0,0,0,.3);font-size:0.93em}
     #info-panel.show{display:block}
+    #close-panel{background:none;border:none;color:#1976d2;cursor:pointer;float:right;font-size:1.2em;padding:0;margin:-5px -5px 0 0}
     a{color:#1976d2;text-decoration:none;font-weight:bold}
     #allow-banner{position:fixed;bottom:0;left:0;right:0;background:#fffde7;padding:12px 16px;border-top:2px solid #ffc107;text-align:center;font-size:0.95em;z-index:2000;display:none;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
     #allow-banner.show{display:block}
@@ -20,7 +21,7 @@
 <body>
   <h3>Multi-Item Concrete Products<br><small>Granite Grip: Blue=In Stock Retail • Orange=No Stock Low • Cover Stain: Purple=In Stock Retail • Pink=No Stock Low • Sealer: Green=In Stock Retail • Red=No Stock Low • Jan 21-22, 2026</small></h3>
   <button id="location-button">Center on Current Location</button>
-  <div id="info-panel"></div>
+  <div id="info-panel"><button id="close-panel">✕</button><div id="info-content"></div></div>
   <div id="allow-banner"><span>This site wants to open directions in your maps app.</span> <button id="allow-btn">Allow</button></div>
   <div id="map"></div>
 
@@ -28,14 +29,20 @@
     let map, userMarker, directionsAllowed = false;
     const banner = document.getElementById('allow-banner');
     const allowBtn = document.getElementById('allow-btn');
+    const infoPanel = document.getElementById('info-panel');
+    const infoPanelClose = document.getElementById('close-panel');
+    let currentAddress = '';
+
+    infoPanelClose.addEventListener('click', () => infoPanel.classList.remove('show'));
 
     function requestDirectionsPermission(address) {
+      currentAddress = address;
       if (directionsAllowed) { launchDirections(address); return; }
       banner.classList.add('show');
       allowBtn.onclick = () => {
         directionsAllowed = true;
         banner.classList.remove('show');
-        launchDirections(address);
+        launchDirections(currentAddress);
       };
     }
 
@@ -66,7 +73,7 @@
           if (userMarker) userMarker.setPosition(loc);
           else userMarker = new google.maps.Marker({
             position: loc, map,
-            icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
             title: "You Are Here"
           });
         }, err => alert("Location error: " + err.message), {enableHighAccuracy: true, timeout: 8000});
@@ -161,18 +168,17 @@
         const isStockRetail = s.stock > 0 && priceNum >= 180;
         const isNoStockLow = s.stock === 0 && (priceNum <= 63 || s.price === "N/A");
 
-        let iconUrl = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+        let iconUrl = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
         if (s.item === "Granite Grip") {
-          iconUrl = isStockRetail ? "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" : isNoStockLow ? "http://maps.google.com/mapfiles/ms/icons/orange-dot.png" : iconUrl;
+          iconUrl = isStockRetail ? "https://maps.google.com/mapfiles/ms/icons/blue-dot.png" : isNoStockLow ? "https://maps.google.com/mapfiles/ms/icons/orange-dot.png" : iconUrl;
         } else if (s.item === "Cover Stain") {
-          iconUrl = isStockRetail ? "http://maps.google.com/mapfiles/ms/icons/purple-dot.png" : isNoStockLow ? "http://maps.google.com/mapfiles/ms/icons/pink-dot.png" : iconUrl;
+          iconUrl = isStockRetail ? "https://maps.google.com/mapfiles/ms/icons/purple-dot.png" : isNoStockLow ? "https://maps.google.com/mapfiles/ms/icons/pink-dot.png" : iconUrl;
         } else if (s.item === "Sealer") {
-          iconUrl = isStockRetail ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png" : isNoStockLow ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png" : iconUrl;
+          iconUrl = isStockRetail ? "https://maps.google.com/mapfiles/ms/icons/green-dot.png" : isNoStockLow ? "https://maps.google.com/mapfiles/ms/icons/red-dot.png" : iconUrl;
         }
 
         const status = isStockRetail ? "In Stock @ Retail" : isNoStockLow ? "No Stock @ Clearance/Low" : "Other";
-        const safe = s.addr.replace(/'/g, "\\'");
-        const html = `<strong>${s.title} (${s.item})</strong><br>${s.addr}<br>Price: ${s.price}<br>Status: ${status} (${s.stock} units)<br><a href="#" onclick="requestDirectionsPermission('${safe}'); return false;">Get Directions</a>`;
+        const html = `<strong>${s.title} (${s.item})</strong><br>${s.addr}<br>Price: ${s.price}<br>Status: ${status} (${s.stock} units)<br><a href="#" data-address="${s.addr}">Get Directions</a>`;
 
         const marker = new google.maps.Marker({
           position: { lat: s.lat, lng: s.lng },
@@ -184,28 +190,24 @@
         marker.addListener("click", () => {
           const iw = new google.maps.InfoWindow({ content: html, maxWidth: 290 });
           iw.open(map, marker);
-          document.getElementById("info-panel").innerHTML = html;
-          document.getElementById("info-panel").classList.add("show");
+          document.getElementById("info-content").innerHTML = html;
+          infoPanel.classList.add("show");
+          
+          const dirBtn = document.querySelector('#info-content a');
+          if (dirBtn) {
+            dirBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              requestDirectionsPermission(dirBtn.getAttribute('data-address'));
+            });
+          }
         });
 
         markers.push(marker);
       });
 
-      map.addListener("click", () => document.getElementById("info-panel").classList.remove("show"));
+      map.addListener("click", () => infoPanel.classList.remove("show"));
     }
   </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGkKq-mR_Yb1xYsGDNJqJQaxQekWzWyOQ&callback=initMap"></script>
 </body>
 </html>
-```
-
-Map is ready with three items:
-- **Granite Grip**: Blue (in stock retail), Orange (no stock low)
-- **Cover Stain**: Purple (in stock retail), Pink (no stock low)
-- **Sealer**: Green (in stock retail), Red (no stock low)
-
-Pins are color-coded by item and status—no overlap confusion. Click any pin for details.
-
-Save as index.html and host (Glitch/Netlify/Github Pages). Ready for your crew!
-
-Send more items or say "add to map" when you have them.
